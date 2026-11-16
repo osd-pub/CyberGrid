@@ -16,4 +16,4 @@
 - [RAM-only共同样例](common-sample.md)：官方授权owner、本地受限会话、浏览器桥接和实际长跑的模块/验收合同（实施目标）。
 - [元数据与兼容性](metadata-and-compatibility.md)：逻辑到期/物理清理、平台/版本、授权窗口和 SDK 分发边界。
 
-- [Rust 多端口会话、调用预算与诊断](peer-sessions.md)：共享 Peer、独立映射、deadline、取消、固定关闭原因与验证边界（源码新增，未发布）。
+- [Rust 多端口会话、调用预算与诊断](peer-sessions.md)：共享 Peer、独立映射、deadline、取消、固定关闭原因与验证边界（项目 v0.9.0 / Rust 0.4.0）。
