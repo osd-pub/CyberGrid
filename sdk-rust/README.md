@@ -139,6 +139,14 @@ The fixed public `endpointPolicy` includes a deterministic hash and a bounded li
 
 `update_device_tunnel_url(Some("https://device.example.test:8443"))` declares a host-operated ingress only after that exact origin and `/` are allowed by trusted policy. It must forward the SDK's fixed `/connect` to its local listener. Dialing derives **`wss://device.example.test:8443/connect`**, retaining the entire authority, including nondefault port or bracketed IPv6. `None` withdraws that explicit override (an enabled bundled provider may still supply its own Quick Tunnel). This never aliases a business HTTP port or browser bridge. The existing WebSocket transport still requires inner device mTLS and current same-owner/product authentication.
 
+## Shared peers and per-call control (unreleased source)
+
+Use one authenticated `Arc<Peer>` for several `peer.map(port, loopback)` mappings or `peer.dial_with_options(port, options)` streams. Closing or dropping one shared mapping does not close another; `peer.close().await` stops its listeners/streams and joins local tasks. Explicit peers do not reconnect across generations. The legacy `Client::map` retains exclusive ownership and listener recovery.
+
+`connect_with_options` adds an absolute monotonic deadline, cancellation, per-attempt direct strategy/timeouts and a diagnostic-only forced transport. `OpenOptions` bounds port setup without expiring a ready stream. New `PeerStream`, Peer and Mapping expose `snapshot()` / `watch_state()`; `subscribe_diagnostics()` and bounded `diagnostics_snapshot()` expose fixed, identity-free reasons and local attempt/session/mapping/stream IDs. New option-call failures carry `Error::Operation`; use `error.diagnostic()` rather than matching message text.
+
+See [the API contract, complete example and validation limits](../docs/peer-sessions.md). These source additions do not establish that the reported CyberNote phone synchronization failure is fixed, and are not yet in a published archive.
+
 ## Transport and provider configuration
 
 Defaults: server `https://cybergrid.aixgg.com`, `direct_strategy: DirectStrategy::Sequential`, WebRTC direct timeout 12 seconds, `iroh_enabled: true`, `iroh_timeout: 8 seconds`, Cloudflare fallback timeout 35 seconds, signal long-poll 15 seconds (with a 1-second minimum spacing); Google and Cloudflare STUN for WebRTC; no interface filter. Only `stun:` URLs are accepted; TURN is disabled. `interface_name` can select the real network interface when testing. Shortening `direct_timeout` alone does not force Cloudflare: iroh can still connect. Set `iroh_enabled: false` as well when explicitly testing the final fallback.
